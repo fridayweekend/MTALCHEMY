@@ -821,7 +821,7 @@ class CoachingPage extends StatelessWidget {
           children: [
             InfoCard(
               child: _Statement(
-                title: 'Career direction',
+                title: 'Career guidance',
                 text: 'Clarify strengths, values and a meaningful next step.',
               ),
             ),
@@ -848,6 +848,43 @@ class CoachingPage extends StatelessWidget {
             ),
           ],
         ),
+        const SectionTitle('Coaching focus'),
+        const ResponsiveGrid(
+          children: [
+            InfoCard(
+              color: Color(0xFFFFF8DE),
+              child: _Statement(
+                title: 'Self-awareness',
+                text:
+                    'Recognize personal patterns, emotions, strengths and values with greater clarity.',
+              ),
+            ),
+            InfoCard(
+              color: Color(0xFFECE6FA),
+              child: _Statement(
+                title: 'Emotional clarity',
+                text:
+                    'Understand difficult emotions and respond with greater intention.',
+              ),
+            ),
+            InfoCard(
+              color: Color(0xFFFFF8DE),
+              child: _Statement(
+                title: 'Confidence & communication',
+                text:
+                    'Express needs, choices and boundaries with empathy and confidence.',
+              ),
+            ),
+            InfoCard(
+              color: Color(0xFFECE6FA),
+              child: _Statement(
+                title: 'Purposeful action',
+                text:
+                    'Turn reflection into practical steps that support personal progress.',
+              ),
+            ),
+          ],
+        ),
         const SectionTitle('How it works'),
         const ResponsiveGrid(
           children: [
@@ -870,6 +907,47 @@ class CoachingPage extends StatelessWidget {
                 title: '3 · Apply',
                 text:
                     'Turn insight into realistic actions and review your progress.',
+              ),
+            ),
+          ],
+        ),
+        const SectionTitle(
+          'Available programmes',
+          subtitle:
+              'Representative coaching directions can be adapted after an initial conversation.',
+        ),
+        ResponsiveGrid(
+          children: [
+            InfoCard(
+              child: _CoachingProgramme(
+                title: 'Career Clarity Coaching',
+                focus:
+                    'Strengths, values, career direction and decision-making.',
+                format: 'Individual sessions · Online or in person',
+              ),
+            ),
+            InfoCard(
+              child: _CoachingProgramme(
+                title: 'Transition Support',
+                focus:
+                    'Confidence, emotional resilience and practical next steps during change.',
+                format: 'Individual sessions · Flexible package',
+              ),
+            ),
+            InfoCard(
+              child: _CoachingProgramme(
+                title: 'Relationship & Communication',
+                focus:
+                    'Self-awareness, empathy, boundaries and constructive communication.',
+                format: 'Individual sessions · Goal-based',
+              ),
+            ),
+            InfoCard(
+              child: _CoachingProgramme(
+                title: 'Personal Growth Journey',
+                focus:
+                    'Emotional clarity, resilience, habits and purposeful development.',
+                format: 'Individual sessions · Customized',
               ),
             ),
           ],
@@ -914,6 +992,25 @@ class CoachingPage extends StatelessWidget {
             ],
           ),
         ),
+        const SectionTitle('What participants say', eyebrow: 'Testimonials'),
+        const ResponsiveGrid(
+          children: [
+            _TestimonialCard(
+              quote:
+                  'The trainer was very well-prepared and explained the content clearly with real-life examples.',
+              detail: 'Anonymous MT Alchemy participant feedback',
+            ),
+            _TestimonialCard(
+              quote: 'She listened to us and encouraged participation.',
+              detail: 'Anonymous MT Alchemy participant feedback',
+            ),
+            _TestimonialCard(
+              quote:
+                  'It was a good experience to discover mindfulness — something new that works for everyone.',
+              detail: 'Anonymous MT Alchemy participant feedback',
+            ),
+          ],
+        ),
         _Callout(
           title: 'Ready to begin?',
           text:
@@ -923,6 +1020,33 @@ class CoachingPage extends StatelessWidget {
         ),
       ],
     ),
+  );
+}
+
+class _CoachingProgramme extends StatelessWidget {
+  const _CoachingProgramme({
+    required this.title,
+    required this.focus,
+    required this.format,
+  });
+  final String title;
+  final String focus;
+  final String format;
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Icon(Icons.psychology_outlined, color: purple, size: 38),
+      const SizedBox(height: 16),
+      Text(title, style: Theme.of(context).textTheme.titleLarge),
+      const SizedBox(height: 12),
+      Text(focus),
+      const SizedBox(height: 16),
+      Text(
+        format,
+        style: const TextStyle(color: purple, fontWeight: FontWeight.w700),
+      ),
+    ],
   );
 }
 
@@ -1122,6 +1246,64 @@ class ProgrammesPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 26),
+          const SectionTitle(
+            'Public programmes',
+            eyebrow: 'Fixed price',
+            subtitle:
+                'Scheduled sessions that individuals can join at a published fee. Prices shown are prototype sample data.',
+          ),
+          const ResponsiveGrid(
+            children: [
+              _PublicProgrammeCard(
+                title: 'Emotional Intelligence Essentials',
+                description:
+                    'An accessible introduction to emotional awareness, regulation and empathy for everyday life and work.',
+                objectives: [
+                  'Recognize emotional patterns',
+                  'Practise emotional regulation',
+                  'Communicate with greater empathy',
+                ],
+                audience: 'Individuals, emerging leaders and working adults',
+                duration: '1 day',
+                participants: 'Up to 25 participants',
+                delivery: 'In-person public workshop',
+                modules: [
+                  'Understanding emotions',
+                  'Self-regulation tools',
+                  'Empathy in action',
+                ],
+                trainer: 'Mabel Tan KH',
+                price: 'RM 380 per participant (sample)',
+              ),
+              _PublicProgrammeCard(
+                title: 'Mindfulness for Everyday Resilience',
+                description:
+                    'A practical workshop for managing stress, creating a mindful pause and building sustainable resilience habits.',
+                objectives: [
+                  'Understand personal stress responses',
+                  'Use simple mindfulness practices',
+                  'Create a personal resilience plan',
+                ],
+                audience: 'Individuals and working adults',
+                duration: 'Half day',
+                participants: 'Up to 30 participants',
+                delivery: 'Online / in person',
+                modules: [
+                  'Stress awareness',
+                  'The mindful pause',
+                  'Resilience in daily life',
+                ],
+                trainer: 'Mabel Tan KH',
+                price: 'RM 220 per participant (sample)',
+              ),
+            ],
+          ),
+          const SectionTitle(
+            'Corporate programmes',
+            eyebrow: 'Request a quote',
+            subtitle:
+                'Tailored programmes for employers. Objectives, participant numbers, delivery and modules can adapt to workforce and team demographics.',
+          ),
           ResponsiveGrid(
             children: [
               for (final p in programmes)
@@ -1208,6 +1390,97 @@ class ProgrammesPage extends StatelessWidget {
       ),
     );
   }
+}
+
+class _PublicProgrammeCard extends StatelessWidget {
+  const _PublicProgrammeCard({
+    required this.title,
+    required this.description,
+    required this.objectives,
+    required this.audience,
+    required this.duration,
+    required this.participants,
+    required this.delivery,
+    required this.modules,
+    required this.trainer,
+    required this.price,
+  });
+  final String title;
+  final String description;
+  final List<String> objectives;
+  final String audience;
+  final String duration;
+  final String participants;
+  final String delivery;
+  final List<String> modules;
+  final String trainer;
+  final String price;
+
+  @override
+  Widget build(BuildContext context) => InfoCard(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Eyebrow('Public programme · Fixed price'),
+        const SizedBox(height: 12),
+        Text(title, style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: 10),
+        Text(description),
+        const SizedBox(height: 16),
+        _Meta(icon: Icons.people_outline, text: 'Target: $audience'),
+        _Meta(icon: Icons.schedule_outlined, text: duration),
+        _Meta(icon: Icons.groups_outlined, text: participants),
+        _Meta(icon: Icons.location_on_outlined, text: delivery),
+        _Meta(icon: Icons.person_outline, text: 'Trainer: $trainer'),
+        const Divider(height: 30),
+        const Text(
+          'Learning objectives',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 8),
+        for (final objective in objectives)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text('• $objective'),
+          ),
+        const SizedBox(height: 10),
+        const Text('Modules', style: TextStyle(fontWeight: FontWeight.w800)),
+        const SizedBox(height: 8),
+        for (var index = 0; index < modules.length; index++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text('Module ${index + 1}: ${modules[index]}'),
+          ),
+        const SizedBox(height: 12),
+        Text(
+          'Fixed price: $price',
+          style: const TextStyle(fontWeight: FontWeight.w900, color: purple),
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            FilledButton(
+              onPressed: () => go(context, '/contact'),
+              child: const Text('Enquire'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Brochure download is represented in this UI prototype.',
+                  ),
+                ),
+              ),
+              icon: const Icon(Icons.download_outlined),
+              label: const Text('Download brochure'),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
 }
 
 class _Meta extends StatelessWidget {
