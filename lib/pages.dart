@@ -2,9 +2,34 @@ import 'package:flutter/material.dart';
 
 import 'theme.dart';
 import 'widgets.dart';
+import 'admin/admin_pages.dart';
+import 'commerce/order_pages.dart';
+import 'commerce/store_pages.dart';
+import 'employer/employer_pages.dart';
+import 'shared/auth_prototype_store.dart';
+import 'shared/member3_login_page.dart';
+import 'commerce/quote_pages.dart';
+import 'commerce/commerce_prototype_store.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
+  final requiredRoles = _requiredRolesFor(route);
+  if (requiredRoles != null &&
+      !requiredRoles.any(AuthPrototypeStore.instance.hasRole)) {
+    final requiredRole = requiredRoles.join(' or ');
+    final signedIn = AuthPrototypeStore.instance.isSignedIn;
+    final page = signedIn
+        ? Member3AccessDeniedPage(requiredRole: requiredRole)
+        : Member3LoginPage(
+            redirectRoute: route,
+            requiredRole: requiredRole,
+            allowedRoles: requiredRoles,
+          );
+    return MaterialPageRoute(
+      settings: const RouteSettings(name: '/login'),
+      builder: (_) => SiteShell(route: '/login', child: page),
+    );
+  }
   final page = switch (route) {
     '/' => const HomePage(),
     '/about' => const AboutPage(),
@@ -20,32 +45,84 @@ Route<dynamic> buildRoute(RouteSettings settings) {
       owner: 'Member 2 - LMS & Learning Hub',
       icon: Icons.school_outlined,
     ),
-    '/store' => const ModuleHandoffPage(
-      title: 'Store',
-      owner: 'Member 3 - E-Commerce',
-      icon: Icons.storefront_outlined,
-    ),
-    '/login' => const ModuleHandoffPage(
-      title: 'Login',
-      owner: 'Member 2 - Authentication',
-      icon: Icons.login,
+    '/store' => const StorePage(),
+    '/login' => Member3LoginPage(
+      redirectRoute: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
     ),
     '/register' => const ModuleHandoffPage(
       title: 'Register',
       owner: 'Member 2 - Authentication',
       icon: Icons.person_add_alt_1,
     ),
-    '/cart' => const ModuleHandoffPage(
-      title: 'Cart',
-      owner: 'Member 3 - E-Commerce',
-      icon: Icons.shopping_bag_outlined,
+    '/cart' => const CartPage(),
+    '/product' => ProductDetailPage(
+      productId: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
     ),
+    '/checkout' => const CheckoutPage(),
+    '/quote-request' => QuoteRequestPage(
+      productId: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/quote-confirmation' => QuoteConfirmationPage(
+      reference: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/quote-requests' => const MyQuoteRequestsPage(),
+    '/order-confirmation' => OrderConfirmationPage(
+      orderNumber: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/order-details' => OrderConfirmationPage(
+      confirmation: false,
+      orderNumber: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/orders' => const MyOrdersPage(),
+    '/digital-library' => const DigitalProductLibraryPage(),
+    '/employer' => const EmployerDashboardPage(),
+    '/employees' => const EmployeeManagementPage(),
+    '/assign-course' => const CourseAssignmentPage(),
+    '/reports' => const LearningReportsPage(),
+    '/admin' => const AdminDashboardPage(),
+    '/admin/products' => const ProductManagementPage(),
+    '/admin/orders' => const OrderManagementPage(),
+    '/admin/quotes' => const QuoteManagementPage(),
+    '/admin/enquiries' => const ContactEnquiriesPage(),
     _ => const HomePage(),
   };
   return MaterialPageRoute(
     settings: RouteSettings(name: route),
     builder: (_) => SiteShell(route: route, child: page),
   );
+}
+
+List<String>? _requiredRolesFor(String route) {
+  if (route == '/admin' || route.startsWith('/admin/')) return ['Admin'];
+  if (route == '/employer' ||
+      route == '/employees' ||
+      route == '/assign-course' ||
+      route == '/reports' ||
+      route == '/quote-requests') {
+    return ['Employer'];
+  }
+  if (const {
+    '/checkout',
+    '/orders',
+    '/order-details',
+    '/order-confirmation',
+  }.contains(route)) {
+    return ['Learner', 'Employer'];
+  }
+  if (route == '/digital-library') return ['Learner'];
+  return null;
 }
 
 const services = [
@@ -1625,7 +1702,22 @@ class ContactPage extends StatefulWidget {
 
 class _ContactPageState extends State<ContactPage> {
   final formKey = GlobalKey<FormState>();
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _phone = TextEditingController();
+  final _organization = TextEditingController();
+  final _message = TextEditingController();
   String? enquiryType;
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _phone.dispose();
+    _organization.dispose();
+    _message.dispose();
+    super.dispose();
+  }
+
   String? requiredField(String? value) => value == null || value.trim().isEmpty
       ? 'Please complete this field'
       : null;
@@ -1646,7 +1738,7 @@ class _ContactPageState extends State<ContactPage> {
           "Let's build a thriving workplace together.",
           eyebrow: 'Contact',
           subtitle:
-              'Tell us what you want to strengthen. This checkpoint form validates input but does not send data to a backend.',
+              'Tell us what you want to strengthen. Enquiries are saved to the local prototype inbox for the team to review.',
         ),
         LayoutBuilder(
           builder: (context, box) {
@@ -1694,23 +1786,27 @@ class _ContactPageState extends State<ContactPage> {
                     ),
                     const SizedBox(height: 22),
                     TextFormField(
+                      controller: _name,
                       decoration: const InputDecoration(labelText: 'Name'),
                       validator: requiredField,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _email,
                       decoration: const InputDecoration(labelText: 'Email'),
                       keyboardType: TextInputType.emailAddress,
                       validator: emailField,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _phone,
                       decoration: const InputDecoration(labelText: 'Phone'),
                       keyboardType: TextInputType.phone,
                       validator: requiredField,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _organization,
                       decoration: const InputDecoration(
                         labelText: 'Organization (optional)',
                       ),
@@ -1741,6 +1837,7 @@ class _ContactPageState extends State<ContactPage> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _message,
                       decoration: const InputDecoration(labelText: 'Message'),
                       minLines: 4,
                       maxLines: 6,
@@ -1750,14 +1847,28 @@ class _ContactPageState extends State<ContactPage> {
                     FilledButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
+                          final enquiry = CommercePrototypeStore.instance
+                              .createContactEnquiry(
+                                name: _name.text.trim(),
+                                email: _email.text.trim(),
+                                phone: _phone.text.trim(),
+                                organization: _organization.text.trim(),
+                                enquiryType: enquiryType!,
+                                message: _message.text.trim(),
+                              );
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
-                                'Form validated. Prototype only — no data was sent.',
+                                'Enquiry ${enquiry.reference} saved to the local Admin inbox. No email was sent.',
                               ),
                             ),
                           );
                           formKey.currentState!.reset();
+                          _name.clear();
+                          _email.clear();
+                          _phone.clear();
+                          _organization.clear();
+                          _message.clear();
                           setState(() => enquiryType = null);
                         }
                       },
