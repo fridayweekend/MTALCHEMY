@@ -98,15 +98,15 @@ class HomePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Eyebrow(
-                      'Human intelligence for an AI-driven world',
+                      'People first. Possibility always.',
                       light: true,
                     ),
                     const SizedBox(height: 22),
                     Text(
-                      'Elevate your value.',
+                      'Elevate your value: Master human intelligence in a rapidly evolving AI-driven world.',
                       style: Theme.of(context).textTheme.displayLarge?.copyWith(
                         color: Colors.white,
-                        fontSize: box.maxWidth < 600 ? 42 : 58,
+                        fontSize: box.maxWidth < 600 ? 36 : 46,
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -1035,6 +1035,12 @@ class ProgrammesPage extends StatelessWidget {
         '1–2 days',
         'In-person / blended',
         ['Self-awareness', 'Empathy', 'Emotionally intelligent decisions'],
+        [
+          'Understanding emotional intelligence',
+          'Leading self',
+          'Leading others',
+        ],
+        'Develop the self-awareness and empathy needed to lead people with clarity, confidence and care.',
       ),
       (
         'Mindful Resilience at Work',
@@ -1042,6 +1048,12 @@ class ProgrammesPage extends StatelessWidget {
         'Half day / 1 day',
         'In-person / online',
         ['Stress awareness', 'Mindful pause', 'Practical resilience habits'],
+        [
+          'Understanding workplace stress',
+          'Mindfulness practice',
+          'Personal resilience plan',
+        ],
+        'Help employees move from reactive stress toward deliberate focus and sustainable resilience.',
       ),
       (
         'Communication That Connects',
@@ -1049,6 +1061,12 @@ class ProgrammesPage extends StatelessWidget {
         '1 day',
         'In-person',
         ['Active listening', 'Constructive conversations', 'Team alignment'],
+        [
+          'Communication styles',
+          'Listening and empathy',
+          'Difficult conversations',
+        ],
+        'Strengthen workplace communication through active listening, empathy and constructive dialogue.',
       ),
       (
         'Team Effectiveness Experience',
@@ -1056,6 +1074,8 @@ class ProgrammesPage extends StatelessWidget {
         '1–2 days',
         'In-person',
         ['Trust', 'Collaboration', 'Creative problem-solving'],
+        ['Building team trust', 'Collaborative challenge', 'Team reflection'],
+        'Build the social connection and mutual trust required for collective resilience and performance.',
       ),
       (
         'Workplace Well-being Discovery',
@@ -1063,6 +1083,8 @@ class ProgrammesPage extends StatelessWidget {
         'Custom',
         'Assessment / facilitated session',
         ['Current-state insight', 'Priority areas', 'Action planning'],
+        ['Well-being assessment', 'Insight review', 'Action priorities'],
+        'Explore workplace well-being needs and identify practical priorities for a healthier culture.',
       ),
       (
         'Customized People Development',
@@ -1070,6 +1092,12 @@ class ProgrammesPage extends StatelessWidget {
         'Custom',
         'Flexible',
         ['Needs alignment', 'Tailored activities', 'Application to work'],
+        [
+          'Discovery and design',
+          'Experiential learning',
+          'Workplace application',
+        ],
+        'A tailored programme adapted to the organization’s workforce, goals and team demographics.',
       ),
     ];
     return PageWidth(
@@ -1105,9 +1133,7 @@ class ProgrammesPage extends StatelessWidget {
                       const SizedBox(height: 12),
                       Text(p.$1, style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 10),
-                      const Text(
-                        'An experiential programme combining reflection, practical tools and workplace application.',
-                      ),
+                      Text(p.$7),
                       const SizedBox(height: 16),
                       _Meta(icon: Icons.people_outline, text: p.$2),
                       const _Meta(
@@ -1122,14 +1148,25 @@ class ProgrammesPage extends StatelessWidget {
                       ),
                       const Divider(height: 30),
                       const Text(
-                        'Learning objectives & modules',
+                        'Learning objectives',
                         style: TextStyle(fontWeight: FontWeight.w800),
                       ),
                       const SizedBox(height: 10),
-                      for (final module in p.$5)
+                      for (final objective in p.$5)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 7),
-                          child: Text('• $module'),
+                          child: Text('• $objective'),
+                        ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Modules',
+                        style: TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      const SizedBox(height: 10),
+                      for (var index = 0; index < p.$6.length; index++)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 7),
+                          child: Text('Module ${index + 1}: ${p.$6[index]}'),
                         ),
                       const SizedBox(height: 14),
                       const Text(
