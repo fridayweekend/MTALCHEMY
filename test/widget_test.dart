@@ -6,7 +6,12 @@ void main() {
     await tester.pumpWidget(const MtAlchemyApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Elevate your value.'), findsOneWidget);
+    expect(
+      find.text(
+        'Elevate your value: Master human intelligence in a rapidly evolving AI-driven world.',
+      ),
+      findsOneWidget,
+    );
     expect(find.text('MT ALCHEMY'), findsWidgets);
   });
 }
