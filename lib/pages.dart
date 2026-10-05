@@ -4,6 +4,7 @@ import 'theme.dart';
 import 'widgets.dart';
 import 'screens/lms/login_register_screen.dart';
 import 'screens/lms/learning_hub_screen.dart';
+import 'screens/lms/course_detail_screen.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
@@ -17,12 +18,11 @@ Route<dynamic> buildRoute(RouteSettings settings) {
     '/impact' => const ImpactPage(),
     '/insights' => const InsightsPage(),
     '/contact' => const ContactPage(),
-    '/upskilling' => const ModuleHandoffPage(
-      title: 'Upskilling',
-      owner: 'Member 2 - LMS & Learning Hub',
-      icon: Icons.school_outlined,
-    ),
+    '/upskilling' => const LearningHubScreen(),
     '/hub' => const LearningHubScreen(),
+    '/course-detail' => CourseDetailScreen(
+      courseId: settings.arguments as String,
+    ),
     '/store' => const ModuleHandoffPage(
       title: 'Store',
       owner: 'Member 3 - E-Commerce',
@@ -40,7 +40,11 @@ Route<dynamic> buildRoute(RouteSettings settings) {
   return MaterialPageRoute(
     settings: RouteSettings(name: route),
     builder: (_) {
-      if (route == '/login' || route == '/register' || route == '/hub') {
+      if (route == '/login' ||
+          route == '/register' ||
+          route == '/hub' ||
+          route == '/upskilling' ||
+          route == '/course-detail') {
         return page;
       }
 
