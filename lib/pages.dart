@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'theme.dart';
 import 'widgets.dart';
+import 'screens/lms/login_register_screen.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
@@ -25,16 +26,8 @@ Route<dynamic> buildRoute(RouteSettings settings) {
       owner: 'Member 3 - E-Commerce',
       icon: Icons.storefront_outlined,
     ),
-    '/login' => const ModuleHandoffPage(
-      title: 'Login',
-      owner: 'Member 2 - Authentication',
-      icon: Icons.login,
-    ),
-    '/register' => const ModuleHandoffPage(
-      title: 'Register',
-      owner: 'Member 2 - Authentication',
-      icon: Icons.person_add_alt_1,
-    ),
+    '/login' => const LoginRegisterScreen(),
+    '/register' => const LoginRegisterScreen(),
     '/cart' => const ModuleHandoffPage(
       title: 'Cart',
       owner: 'Member 3 - E-Commerce',
@@ -44,7 +37,13 @@ Route<dynamic> buildRoute(RouteSettings settings) {
   };
   return MaterialPageRoute(
     settings: RouteSettings(name: route),
-    builder: (_) => SiteShell(route: route, child: page),
+    builder: (_) {
+      if (route == '/login' || route == '/register') {
+        return page;
+      }
+
+      return SiteShell(route: route, child: page);
+    },
   );
 }
 
