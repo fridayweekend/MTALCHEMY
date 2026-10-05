@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'theme.dart';
 import 'widgets.dart';
 import 'screens/lms/login_register_screen.dart';
+import 'screens/lms/learning_hub_screen.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
@@ -21,6 +22,7 @@ Route<dynamic> buildRoute(RouteSettings settings) {
       owner: 'Member 2 - LMS & Learning Hub',
       icon: Icons.school_outlined,
     ),
+    '/hub' => const LearningHubScreen(),
     '/store' => const ModuleHandoffPage(
       title: 'Store',
       owner: 'Member 3 - E-Commerce',
@@ -38,7 +40,7 @@ Route<dynamic> buildRoute(RouteSettings settings) {
   return MaterialPageRoute(
     settings: RouteSettings(name: route),
     builder: (_) {
-      if (route == '/login' || route == '/register') {
+      if (route == '/login' || route == '/register' || route == '/hub') {
         return page;
       }
 

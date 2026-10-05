@@ -76,7 +76,7 @@ class CourseCard extends StatelessWidget {
           const SizedBox(height: 14),
 
           Text(
-            '₹${course.price.toStringAsFixed(0)}',
+            'RM ${course.price.toStringAsFixed(0)}',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 16),
