@@ -5,6 +5,7 @@ import 'widgets.dart';
 import 'screens/lms/login_register_screen.dart';
 import 'screens/lms/learning_hub_screen.dart';
 import 'screens/lms/course_detail_screen.dart';
+import 'screens/lms/learner_dashboard_screen.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
@@ -22,6 +23,9 @@ Route<dynamic> buildRoute(RouteSettings settings) {
     '/hub' => const LearningHubScreen(),
     '/course-detail' => CourseDetailScreen(
       courseId: settings.arguments as String,
+    ),
+    '/dashboard' => LearnerDashboardScreen(
+      courseId: settings.arguments as String? ?? 'ei-fundamentals',
     ),
     '/store' => const ModuleHandoffPage(
       title: 'Store',
@@ -44,7 +48,8 @@ Route<dynamic> buildRoute(RouteSettings settings) {
           route == '/register' ||
           route == '/hub' ||
           route == '/upskilling' ||
-          route == '/course-detail') {
+          route == '/course-detail' ||
+          route == '/dashboard') {
         return page;
       }
 
