@@ -6,6 +6,7 @@ import 'screens/lms/login_register_screen.dart';
 import 'screens/lms/learning_hub_screen.dart';
 import 'screens/lms/course_detail_screen.dart';
 import 'screens/lms/learner_dashboard_screen.dart';
+import 'screens/lms/course_player_screen.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
