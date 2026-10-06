@@ -39,7 +39,8 @@ List<PlayerLesson> _sampleLessons() => [
 ];
 
 class CoursePlayerScreen extends StatefulWidget {
-  const CoursePlayerScreen({super.key});
+  const CoursePlayerScreen({super.key, this.courseId = 'ei-fundamentals'});
+  final String courseId;
 
   @override
   State<CoursePlayerScreen> createState() => _CoursePlayerScreenState();
@@ -49,14 +50,6 @@ class _CoursePlayerScreenState extends State<CoursePlayerScreen> {
   final _lessons = _sampleLessons();
   late final Set<int> _done = {for (var i = 0; i < 13; i++) i};
   int _current = 13;
-  String? _courseId;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments;
-    _courseId = args is Map ? args['courseId']?.toString() : args?.toString();
-  }
 
   double get _progress => _done.length / _lessons.length;
   bool get _isLast => _current == _lessons.length - 1;
@@ -70,7 +63,7 @@ class _CoursePlayerScreenState extends State<CoursePlayerScreen> {
 
   void _next() {
     if (_isLast) {
-      Navigator.pushNamed(context, '/quiz', arguments: _courseId);
+      Navigator.pushNamed(context, '/quiz', arguments: widget.courseId);
     } else {
       setState(() => _current++);
     }
