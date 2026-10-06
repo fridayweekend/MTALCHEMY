@@ -7,6 +7,7 @@ import 'screens/lms/learning_hub_screen.dart';
 import 'screens/lms/course_detail_screen.dart';
 import 'screens/lms/learner_dashboard_screen.dart';
 import 'screens/lms/course_player_screen.dart';
+import 'screens/lms/quiz_screen.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
@@ -29,6 +30,9 @@ Route<dynamic> buildRoute(RouteSettings settings) {
       courseId: settings.arguments as String? ?? 'ei-fundamentals',
     ),
      '/course-player' => CoursePlayerScreen(
+      courseId: settings.arguments as String? ?? 'ei-fundamentals',
+    ),
+     '/quiz' => QuizScreen(
       courseId: settings.arguments as String? ?? 'ei-fundamentals',
     ),
     '/store' => const ModuleHandoffPage(
@@ -54,7 +58,8 @@ Route<dynamic> buildRoute(RouteSettings settings) {
           route == '/upskilling' ||
           route == '/course-detail' ||
           route == '/dashboard' ||
-          route == '/course-player') {
+          route == '/course-player' ||
+          route == '/quiz') {
         return page;
       }
 
