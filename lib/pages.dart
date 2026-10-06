@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'theme.dart';
 import 'widgets.dart';
+import 'screens/lms/login_register_screen.dart';
+import 'screens/lms/learning_hub_screen.dart';
+import 'screens/lms/course_detail_screen.dart';
+import 'screens/lms/learner_dashboard_screen.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
@@ -15,26 +19,21 @@ Route<dynamic> buildRoute(RouteSettings settings) {
     '/impact' => const ImpactPage(),
     '/insights' => const InsightsPage(),
     '/contact' => const ContactPage(),
-    '/upskilling' => const ModuleHandoffPage(
-      title: 'Upskilling',
-      owner: 'Member 2 - LMS & Learning Hub',
-      icon: Icons.school_outlined,
+    '/upskilling' => const LearningHubScreen(),
+    '/hub' => const LearningHubScreen(),
+    '/course-detail' => CourseDetailScreen(
+      courseId: settings.arguments as String,
+    ),
+    '/dashboard' => LearnerDashboardScreen(
+      courseId: settings.arguments as String? ?? 'ei-fundamentals',
     ),
     '/store' => const ModuleHandoffPage(
       title: 'Store',
       owner: 'Member 3 - E-Commerce',
       icon: Icons.storefront_outlined,
     ),
-    '/login' => const ModuleHandoffPage(
-      title: 'Login',
-      owner: 'Member 2 - Authentication',
-      icon: Icons.login,
-    ),
-    '/register' => const ModuleHandoffPage(
-      title: 'Register',
-      owner: 'Member 2 - Authentication',
-      icon: Icons.person_add_alt_1,
-    ),
+    '/login' => const LoginRegisterScreen(),
+    '/register' => const LoginRegisterScreen(),
     '/cart' => const ModuleHandoffPage(
       title: 'Cart',
       owner: 'Member 3 - E-Commerce',
@@ -44,7 +43,18 @@ Route<dynamic> buildRoute(RouteSettings settings) {
   };
   return MaterialPageRoute(
     settings: RouteSettings(name: route),
-    builder: (_) => SiteShell(route: route, child: page),
+    builder: (_) {
+      if (route == '/login' ||
+          route == '/register' ||
+          route == '/hub' ||
+          route == '/upskilling' ||
+          route == '/course-detail' ||
+          route == '/dashboard') {
+        return page;
+      }
+
+      return SiteShell(route: route, child: page);
+    },
   );
 }
 
