@@ -28,6 +28,9 @@ Route<dynamic> buildRoute(RouteSettings settings) {
     '/dashboard' => LearnerDashboardScreen(
       courseId: settings.arguments as String? ?? 'ei-fundamentals',
     ),
+     '/course-player' => CoursePlayerScreen(
+      courseId: settings.arguments as String? ?? 'ei-fundamentals',
+    ),
     '/store' => const ModuleHandoffPage(
       title: 'Store',
       owner: 'Member 3 - E-Commerce',
@@ -50,7 +53,8 @@ Route<dynamic> buildRoute(RouteSettings settings) {
           route == '/hub' ||
           route == '/upskilling' ||
           route == '/course-detail' ||
-          route == '/dashboard') {
+          route == '/dashboard' ||
+          route == '/course-player') {
         return page;
       }
 
