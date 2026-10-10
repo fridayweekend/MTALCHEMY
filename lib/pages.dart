@@ -2,6 +2,22 @@ import 'package:flutter/material.dart';
 
 import 'theme.dart';
 import 'widgets.dart';
+import 'admin/admin_pages.dart';
+import 'commerce/order_pages.dart';
+import 'commerce/store_pages.dart';
+import 'commerce/quote_pages.dart';
+import 'commerce/commerce_prototype_store.dart';
+import 'employer/employer_pages.dart';
+import 'shared/auth_prototype_store.dart';
+import 'shared/member3_login_page.dart';
+import 'screens/lms/login_register_screen.dart';
+import 'screens/lms/learning_hub_screen.dart';
+import 'screens/lms/course_detail_screen.dart';
+import 'screens/lms/learner_dashboard_screen.dart';
+import 'screens/lms/certificate_screen.dart';
+import 'screens/lms/trainer_dashboard_screen.dart';
+import 'screens/lms/course_player_screen.dart';
+import 'screens/lms/quiz_screen.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
@@ -32,31 +48,84 @@ Route<dynamic> buildRoute(RouteSettings settings) {
     '/impact' => const ImpactPage(),
     '/insights' => const InsightsPage(),
     '/contact' => const ContactPage(),
-    '/upskilling' => const ModuleHandoffPage(
-      title: 'Upskilling',
-      owner: 'Member 2 - LMS & Learning Hub',
-      icon: Icons.school_outlined,
+    '/upskilling' => const LearningHubScreen(),
+    '/hub' => const LearningHubScreen(),
+    '/course-detail' => CourseDetailScreen(
+      courseId: settings.arguments is String
+          ? settings.arguments! as String
+          : 'ei-fundamentals',
     ),
-    '/store' => const ModuleHandoffPage(
-      title: 'Store',
-      owner: 'Member 3 - E-Commerce',
-      icon: Icons.storefront_outlined,
+    '/store' => const StorePage(),
+    '/login' => Member3LoginPage(
+      redirectRoute: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
     ),
-    '/login' => const ModuleHandoffPage(
-      title: 'Login',
-      owner: 'Member 2 - Authentication',
-      icon: Icons.login,
+    '/register' => const LoginRegisterScreen(),
+    '/cart' => const CartPage(),
+    '/product' => ProductDetailPage(
+      productId: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
     ),
-    '/register' => const ModuleHandoffPage(
-      title: 'Register',
-      owner: 'Member 2 - Authentication',
-      icon: Icons.person_add_alt_1,
+    '/dashboard' => LearnerDashboardScreen(
+      courseId: settings.arguments is String
+          ? settings.arguments! as String
+          : 'ei-fundamentals',
     ),
-    '/cart' => const ModuleHandoffPage(
-      title: 'Cart',
-      owner: 'Member 3 - E-Commerce',
-      icon: Icons.shopping_bag_outlined,
+    '/course-player' => CoursePlayerScreen(
+      courseId: settings.arguments is String
+          ? settings.arguments! as String
+          : 'ei-fundamentals',
     ),
+    '/quiz' => QuizScreen(
+      courseId: settings.arguments is String
+          ? settings.arguments! as String
+          : 'ei-fundamentals',
+    ),
+    '/certificate' => CertificateScreen(
+      courseId: settings.arguments is Map
+          ? (settings.arguments as Map)['courseId'] as String? ?? 'ei-fundamentals'
+          : 'ei-fundamentals',
+      score: settings.arguments is Map
+          ? (settings.arguments as Map)['score'] as String? ?? ''
+          : '',
+    ),
+    '/trainer-dashboard' => const TrainerDashboardScreen(),
+    '/checkout' => const CheckoutPage(),
+    '/quote-request' => QuoteRequestPage(
+      productId: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/quote-confirmation' => QuoteConfirmationPage(
+      reference: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/quote-requests' => const MyQuoteRequestsPage(),
+    '/order-confirmation' => OrderConfirmationPage(
+      orderNumber: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/order-details' => OrderConfirmationPage(
+      confirmation: false,
+      orderNumber: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/orders' => const MyOrdersPage(),
+    '/digital-library' => const DigitalProductLibraryPage(),
+    '/employer' => const EmployerDashboardPage(),
+    '/employees' => const EmployeeManagementPage(),
+    '/assign-course' => const CourseAssignmentPage(),
+    '/reports' => const LearningReportsPage(),
+    '/admin' => const AdminDashboardPage(),
+    '/admin/products' => const ProductManagementPage(),
+    '/admin/orders' => const OrderManagementPage(),
+    '/admin/quotes' => const QuoteManagementPage(),
+    '/admin/enquiries' => const ContactEnquiriesPage(),
     _ => const HomePage(),
   };
   return MaterialPageRoute(

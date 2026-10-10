@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../shared/auth_prototype_store.dart';
 import '../shared/portal_components.dart';
 import '../theme.dart';
@@ -184,8 +183,9 @@ class _QuoteRequestPageState extends State<QuoteRequestPage> {
                   const SizedBox(height: 16),
                   FilledButton.icon(
                     onPressed: () {
-                      if (!_key.currentState!.validate() || lines.isEmpty)
+                      if (!_key.currentState!.validate() || lines.isEmpty) {
                         return;
+                      }
                       final quote = _store.createQuoteRequest(
                         customerName: _name.text.trim(),
                         organizationName: _organization.text.trim(),
@@ -221,7 +221,9 @@ class QuoteConfirmationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     QuoteRequest? quote;
     for (final request in _store.quoteRequests) {
-      if (request.reference == reference) quote = request;
+      if (request.reference == reference) {
+        quote = request;
+      }
     }
     return PortalPage(
       title: 'Your request is with our team.',
@@ -459,7 +461,9 @@ class _QuoteEditDialogState extends State<_QuoteEditDialog> {
   }
 
   void _save() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
     _store.updateQuoteRequest(
       widget.request.reference,
       status: _status,
@@ -497,7 +501,9 @@ class _QuoteEditDialogState extends State<_QuoteEditDialog> {
                   DropdownMenuItem(value: 'Declined', child: Text('Declined')),
                 ],
                 onChanged: (value) {
-                  if (value != null) setState(() => _status = value);
+                  if (value != null) {
+                      setState(() => _status = value);
+                    }
                 },
               ),
               const SizedBox(height: 12),
@@ -512,8 +518,9 @@ class _QuoteEditDialogState extends State<_QuoteEditDialog> {
                 ),
                 validator: (value) {
                   if (_status != 'Quoted' &&
-                      (value == null || value.trim().isEmpty))
+                      (value == null || value.trim().isEmpty)) {
                     return null;
+                  }
                   final parsed = double.tryParse(value ?? '');
                   return parsed == null || parsed < 0
                       ? 'Enter a valid amount'

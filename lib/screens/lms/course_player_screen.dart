@@ -6,7 +6,6 @@ import '../../theme.dart';
 import '../../widgets/lms/content_viewer.dart';
 import '../../widgets/lms/module_sidebar.dart';
 import '../../widgets/lms/progress_bar_card.dart';
-import '../../data/progress_store.dart'; 
 
 const _types = [
   LessonType.video,
@@ -49,6 +48,7 @@ class _CoursePlayerScreenState extends State<CoursePlayerScreen> {
   late final _lessons = _sampleLessons(_course.modules);
   late final int _startDone =
       (_course.progress / 100 * _lessons.length).round();
+
   // _done is the shared in-memory store, so progress survives leaving the screen.
   late final Set<int> _done = completedLessons.putIfAbsent(
     _course.id,
@@ -91,7 +91,9 @@ class _CoursePlayerScreenState extends State<CoursePlayerScreen> {
       currentIndex: _current,
       completed: _done,
       onSelect: (i) {
-        if (!wide) Navigator.pop(context); // close the drawer
+        if (!wide) {
+          Navigator.pop(context); // close the drawer
+        }
         setState(() => _current = i);
       },
     );
@@ -147,7 +149,9 @@ class _CoursePlayerScreenState extends State<CoursePlayerScreen> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            border: Border(top: BorderSide(color: deepBlue.withValues(alpha: .08))),
+            border: Border(
+              top: BorderSide(color: deepBlue.withValues(alpha: .08)),
+            ),
           ),
           child: Wrap(
             alignment: WrapAlignment.center,
