@@ -6,6 +6,8 @@ import 'screens/lms/login_register_screen.dart';
 import 'screens/lms/learning_hub_screen.dart';
 import 'screens/lms/course_detail_screen.dart';
 import 'screens/lms/learner_dashboard_screen.dart';
+import 'screens/lms/certificate_screen.dart';
+import 'screens/lms/trainer_dashboard_screen.dart';
 import 'screens/lms/course_player_screen.dart';
 import 'screens/lms/quiz_screen.dart';
 
@@ -35,6 +37,11 @@ Route<dynamic> buildRoute(RouteSettings settings) {
      '/quiz' => QuizScreen(
       courseId: settings.arguments as String? ?? 'ei-fundamentals',
     ),
+    '/certificate' => CertificateScreen(
+      courseId: (settings.arguments as Map?)?['courseId'] as String? ?? 'ei-fundamentals',
+      score: (settings.arguments as Map?)?['score'] as String? ?? '',
+    ),
+    '/trainer-dashboard' => const TrainerDashboardScreen(),
     '/store' => const ModuleHandoffPage(
       title: 'Store',
       owner: 'Member 3 - E-Commerce',
@@ -52,14 +59,7 @@ Route<dynamic> buildRoute(RouteSettings settings) {
   return MaterialPageRoute(
     settings: RouteSettings(name: route),
     builder: (_) {
-      if (route == '/login' ||
-          route == '/register' ||
-          route == '/hub' ||
-          route == '/upskilling' ||
-          route == '/course-detail' ||
-          route == '/dashboard' ||
-          route == '/course-player' ||
-          route == '/quiz') {
+      if (const {'/login', '/register', '/hub', '/upskilling', '/course-detail', '/dashboard', '/course-player', '/quiz', '/certificate', '/trainer-dashboard'}.contains(route)) {
         return page;
       }
 

@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+
+import '../../data/mock_data.dart';
+import '../../theme.dart';
+import '../../widgets.dart'; // InfoCard
+import '../../widgets/lms/course_card.dart';
+import '../../widgets/lms/progress_bar_card.dart';
+
+class TrainerDashboardScreen extends StatelessWidget {
+  const TrainerDashboardScreen({super.key});
+
+  static const _stats = [
+    (Icons.menu_book_outlined, '3', 'Assigned courses'),
+    (Icons.groups_outlined, '24', 'Learners'),
+    (Icons.rate_review_outlined, '5', 'To review'),
+    (Icons.trending_up, '62%', 'Avg. progress'),
+  ];
+
+  static const _materials = [
+    (Icons.play_circle_outline, 'Introduction to Emotional Intelligence', 'Video · Module 1'),
+    (Icons.picture_as_pdf_outlined, 'Self-Awareness Workbook', 'PDF · Module 2'),
+    (Icons.slideshow_outlined, 'Emotional Regulation Slides', 'Presentation · Module 3'),
+    (Icons.headphones_outlined, 'Guided Breathing Exercise', 'Audio · Module 3'),
+  ];
+
+  static const _assessments = [
+    ('EI Fundamentals: Module 2 Quiz', '3 submissions waiting'),
+    ('Mindfulness at Work: Final Assessment', '2 submissions waiting'),
+    ('Leadership Essentials: Module 1 Quiz', '1 submission waiting'),
+  ];
+
+  static const _learners = [
+    ('Aisha Rahman', 'Emotional Intelligence Fundamentals', 0.80),
+    ('Daniel Lee', 'Leadership Essentials', 0.45),
+    ('Mei Ling', 'Mindfulness at Work', 1.0),
+    ('Farid Hassan', 'Effective Communication', 0.25),
+  ];
+
+  void _openCourse(BuildContext context, Course course) =>
+      Navigator.pushNamed(context, '/course-player', arguments: course.id);
+
+  void _mock(BuildContext context, String message) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+
+  Widget _heading(BuildContext context, String text) => Padding(
+    padding: const EdgeInsets.only(top: 32, bottom: 16),
+    child: Text(text, style: Theme.of(context).textTheme.headlineMedium),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Trainer Dashboard')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: deepBlue,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome, Trainer',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Manage your courses, materials and learner progress.',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                LayoutBuilder(
+                  builder: (context, box) {
+                    final cols = box.maxWidth >= 900 ? 4 : (box.maxWidth >= 500 ? 2 : 1);
+                    final w = (box.maxWidth - (cols - 1) * 16) / cols;
+                    return Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children: [
+                        for (final s in _stats)
+                          SizedBox(
+                            width: w,
+                            child: InfoCard(
+                              padding: 20,
+                              child: Column(
+                                children: [
+                                  Icon(s.$1, size: 30, color: purple),
+                                  const SizedBox(height: 10),
+                                  Text(s.$2, style: Theme.of(context).textTheme.headlineMedium),
+                                  const SizedBox(height: 4),
+                                  Text(s.$3),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+
+                _heading(context, 'Assigned courses'),
+                for (final course in mockCourses.take(3))
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: CourseCard(
+                      course: course,
+                      onContinueCourse: () => _openCourse(context, course),
+                      onViewCourse: () => _openCourse(context, course),
+                    ),
+                  ),
+
+                _heading(context, 'Learning materials'),
+                InfoCard(
+                  padding: 8,
+                  child: Column(
+                    children: [
+                      for (final m in _materials)
+                        ListTile(
+                          leading: Icon(m.$1, color: purple),
+                          title: Text(m.$2),
+                          subtitle: Text(m.$3),
+                        ),
+                    ],
+                  ),
+                ),
+
+                _heading(context, 'Assessments to review'),
+                InfoCard(
+                  padding: 8,
+                  child: Column(
+                    children: [
+                      for (final a in _assessments)
+                        ListTile(
+                          leading: const Icon(Icons.rate_review_outlined, color: purple),
+                          title: Text(a.$1),
+                          subtitle: Text(a.$2),
+                          trailing: OutlinedButton(
+                            onPressed: () => _mock(context, 'Prototype: review screen not built'),
+                            child: const Text('Review'),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+
+                _heading(context, 'Learners and progress'),
+                for (final l in _learners)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: ProgressBarCard(progress: l.$3, label: '${l.$1} · ${l.$2}'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

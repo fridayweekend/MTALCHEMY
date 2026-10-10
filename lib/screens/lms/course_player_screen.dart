@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../data/mock_data.dart';
+import '../../data/progress_store.dart';
 import '../../theme.dart';
 import '../../widgets/lms/content_viewer.dart';
 import '../../widgets/lms/module_sidebar.dart';
 import '../../widgets/lms/progress_bar_card.dart';
-
-const _moduleTitles = [
-  'Understanding Emotions',
-  'Self-Awareness',
-  'Self-Regulation',
-  'Empathy',
-  'Applying EI at Work',
-];
+import '../../data/progress_store.dart'; 
 
 const _types = [
   LessonType.video,
@@ -24,12 +19,12 @@ const _types = [
 ];
 
 /// 5 modules x 4 lessons = 20 lessons, so 13 completed = 65%.
-List<PlayerLesson> _sampleLessons() => [
+List<PlayerLesson> _sampleLessons(List<String> titles) => [
   for (var m = 0; m < 5; m++)
     for (var l = 0; l < 4; l++)
       PlayerLesson(
         moduleIndex: m,
-        moduleTitle: _moduleTitles[m],
+        moduleTitle: titles[m],
         title: 'Lesson ${m + 1}.${l + 1}',
         type: _types[(m * 4 + l) % _types.length],
         body: 'Sample content for lesson ${m + 1}.${l + 1}. Emotional '
@@ -47,15 +42,34 @@ class CoursePlayerScreen extends StatefulWidget {
 }
 
 class _CoursePlayerScreenState extends State<CoursePlayerScreen> {
-  final _lessons = _sampleLessons();
-  late final Set<int> _done = {for (var i = 0; i < 13; i++) i};
-  int _current = 13;
+  Course get _course => mockCourses.firstWhere(
+    (c) => c.id == widget.courseId,
+    orElse: () => mockCourses.first,
+  );
+  late final _lessons = _sampleLessons(_course.modules);
+  late final int _startDone =
+      (_course.progress / 100 * _lessons.length).round();
+  // _done is the shared in-memory store, so progress survives leaving the screen.
+  late final Set<int> _done = completedLessons.putIfAbsent(
+    _course.id,
+    () => {for (var i = 0; i < _startDone; i++) i},
+  );
+  late int _current =
+      lastLesson[_course.id] ?? _startDone.clamp(0, _lessons.length - 1).toInt();
+
+  @override
+  void dispose() {
+    lastLesson[_course.id] = _current;
+    saveProgress();
+    super.dispose();
+  }
 
   double get _progress => _done.length / _lessons.length;
   bool get _isLast => _current == _lessons.length - 1;
 
   void _markComplete() {
     setState(() => _done.add(_current));
+    saveProgress();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${_lessons[_current].title} marked complete')),
     );
@@ -83,7 +97,7 @@ class _CoursePlayerScreenState extends State<CoursePlayerScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Emotional Intelligence Fundamentals')),
+      appBar: AppBar(title: Text(_course.title)),
       drawer: wide ? null : Drawer(child: SafeArea(child: sidebar)),
       body: Row(
         children: [

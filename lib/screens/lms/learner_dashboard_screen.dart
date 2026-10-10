@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/mock_data.dart';
+import '../../data/progress_store.dart';
 import '../../widgets/lms/course_card.dart';
 
 class LearnerDashboardScreen extends StatefulWidget {
@@ -37,7 +38,9 @@ class _LearnerDashboardScreenState extends State<LearnerDashboardScreen> {
   }
 
   void continueCourse() {
-    Navigator.pushNamed(context, '/course-player', arguments: course.id);
+    Navigator.pushNamed(context, '/course-player', arguments: course.id).then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -101,7 +104,7 @@ class _LearnerDashboardScreenState extends State<LearnerDashboardScreen> {
                       child: _statCard(
                         context,
                         icon: Icons.play_circle_outline,
-                        value: '1',
+                        value: completedCourses.contains(course.id) ? '0' : '1',
                         label: 'In Progress',
                       ),
                     ),
@@ -110,7 +113,7 @@ class _LearnerDashboardScreenState extends State<LearnerDashboardScreen> {
                       child: _statCard(
                         context,
                         icon: Icons.check_circle_outline,
-                        value: '0',
+                        value: completedCourses.length.toString(),
                         label: 'Completed',
                       ),
                     ),

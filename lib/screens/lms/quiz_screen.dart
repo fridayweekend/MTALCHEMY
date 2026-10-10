@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/progress_store.dart';
 import '../../theme.dart';
 import '../../widgets.dart'; // InfoCard, Eyebrow
 
@@ -154,6 +155,7 @@ class _QuizScreenState extends State<QuizScreen> {
     }
     if (_index == _questions.length - 1) {
       setState(() => _submitted = true);
+      if (_score / _questions.length >= _passMark) completeCourse(widget.courseId);
     } else {
       setState(() => _index++);
       _shortController.clear();

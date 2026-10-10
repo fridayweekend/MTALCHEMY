@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/mock_data.dart';
+import '../../data/progress_store.dart';
 
 class CourseCard extends StatelessWidget {
   final Course course;
@@ -81,14 +82,14 @@ class CourseCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          if (course.progress > 0) ...[
+          if (progressFor(course) > 0) ...[
             Text(
-              '${course.progress}% complete',
+              '${progressFor(course)}% complete',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 6),
             LinearProgressIndicator(
-              value: course.progress / 100,
+              value: progressFor(course) / 100,
               minHeight: 7,
               borderRadius: BorderRadius.circular(10),
             ),
@@ -98,9 +99,9 @@ class CourseCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: course.progress > 0 ? onContinueCourse : onViewCourse,
+              onPressed: progressFor(course) > 0 ? (onContinueCourse ?? onViewCourse) : onViewCourse,
               child: Text(
-                course.progress > 0 ? 'Continue Course' : 'View Course',
+                progressFor(course) > 0 ? 'Continue Course' : 'View Course',
               ),
             ),
           ),
@@ -128,3 +129,4 @@ class _InfoItem extends StatelessWidget {
     );
   }
 }
+
