@@ -1,0 +1,200 @@
+import 'package:flutter/material.dart';
+
+import '../../data/mock_data.dart';
+import '../../data/progress_store.dart';
+import '../../theme.dart';
+import '../../widgets.dart'; // Eyebrow
+
+const _months = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+class CertificateScreen extends StatelessWidget {
+  const CertificateScreen({
+    super.key,
+    this.courseId = 'ei-fundamentals',
+    this.score = '',
+  });
+
+  final String courseId;
+  final String score;
+
+  Course get _course => mockCourses.firstWhere(
+    (c) => c.id == courseId,
+    orElse: () => mockCourses.first,
+  );
+
+  void _mock(BuildContext context, String message) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+
+  @override
+  Widget build(BuildContext context) {
+    final course = _course;
+    completeCourse(course.id); // reaching this screen means the quiz was passed
+    final now = DateTime.now();
+    final date = '${now.day} ${_months[now.month - 1]} ${now.year}';
+    final certId =
+        'MTA-${now.year}-${course.id.substring(0, 2).toUpperCase()}-0001';
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Certificate')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 820),
+            child: Column(
+              children: [
+                const Icon(Icons.celebration_outlined, size: 56, color: purple),
+                const SizedBox(height: 12),
+                Text(
+                  'Congratulations!',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(fontSize: 34),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  score.isEmpty
+                      ? 'You have completed the course.'
+                      : 'You passed the assessment with a score of $score.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const SizedBox(height: 28),
+
+                // Certificate frame: outer Container = border, inner = paper
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: deepBlue,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                    decoration: BoxDecoration(
+                      color: canvas,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: softYellow, width: 3),
+                    ),
+                    child: Column(
+                      children: [
+                        const Eyebrow('MT Alchemy'),
+                        const SizedBox(height: 14),
+                        const Text(
+                          'Certificate of Completion',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            color: deepBlue,
+                          ),
+                        ),
+                        const SizedBox(height: 22),
+                        const Text('This is to certify that'),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Learner',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w800,
+                            color: deepBlue,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text('has successfully completed'),
+                        const SizedBox(height: 10),
+                        Text(
+                          course.title,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            color: purple,
+                          ),
+                        ),
+                        const Divider(height: 44),
+                        Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 24,
+                          runSpacing: 20,
+                          children: [
+                            _Fact(label: 'Completion date', value: date),
+                            _Fact(label: 'Certificate ID', value: certId),
+                            _Fact(label: 'Trainer', value: course.instructor),
+                            Column(
+                              children: [
+                                Container(
+                                  width: 84,
+                                  height: 84,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(color: deepBlue),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(Icons.qr_code_2, size: 64, color: deepBlue),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text('QR placeholder', style: TextStyle(fontSize: 11)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 28),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: () => _mock(context, 'Prototype: certificate preview is shown above'),
+                      icon: const Icon(Icons.visibility_outlined),
+                      label: const Text('View Certificate'),
+                    ),
+                    FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: softYellow,
+                        foregroundColor: deepBlue,
+                      ),
+                      onPressed: () => _mock(context, 'Prototype: download is simulated'),
+                      icon: const Icon(Icons.download_outlined),
+                      label: const Text('Download Certificate'),
+                    ),
+                    OutlinedButton(
+                      onPressed: () => Navigator.pushNamed(context, '/dashboard', arguments: course.id),
+                      child: const Text('Back to dashboard'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Fact extends StatelessWidget {
+  const _Fact({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+      const SizedBox(height: 4),
+      Text(value, style: const TextStyle(fontWeight: FontWeight.w800, color: deepBlue)),
+    ],
+  );
+}

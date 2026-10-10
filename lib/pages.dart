@@ -2,14 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'theme.dart';
 import 'widgets.dart';
-import 'admin/admin_pages.dart';
-import 'commerce/order_pages.dart';
-import 'commerce/store_pages.dart';
-import 'employer/employer_pages.dart';
-import 'shared/auth_prototype_store.dart';
-import 'shared/member3_login_page.dart';
-import 'commerce/quote_pages.dart';
-import 'commerce/commerce_prototype_store.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
@@ -45,62 +37,37 @@ Route<dynamic> buildRoute(RouteSettings settings) {
       owner: 'Member 2 - LMS & Learning Hub',
       icon: Icons.school_outlined,
     ),
-    '/store' => const StorePage(),
-    '/login' => Member3LoginPage(
-      redirectRoute: settings.arguments is String
-          ? settings.arguments! as String
-          : null,
+    '/store' => const ModuleHandoffPage(
+      title: 'Store',
+      owner: 'Member 3 - E-Commerce',
+      icon: Icons.storefront_outlined,
+    ),
+    '/login' => const ModuleHandoffPage(
+      title: 'Login',
+      owner: 'Member 2 - Authentication',
+      icon: Icons.login,
     ),
     '/register' => const ModuleHandoffPage(
       title: 'Register',
       owner: 'Member 2 - Authentication',
       icon: Icons.person_add_alt_1,
     ),
-    '/cart' => const CartPage(),
-    '/product' => ProductDetailPage(
-      productId: settings.arguments is String
-          ? settings.arguments! as String
-          : null,
+    '/cart' => const ModuleHandoffPage(
+      title: 'Cart',
+      owner: 'Member 3 - E-Commerce',
+      icon: Icons.shopping_bag_outlined,
     ),
-    '/checkout' => const CheckoutPage(),
-    '/quote-request' => QuoteRequestPage(
-      productId: settings.arguments is String
-          ? settings.arguments! as String
-          : null,
-    ),
-    '/quote-confirmation' => QuoteConfirmationPage(
-      reference: settings.arguments is String
-          ? settings.arguments! as String
-          : null,
-    ),
-    '/quote-requests' => const MyQuoteRequestsPage(),
-    '/order-confirmation' => OrderConfirmationPage(
-      orderNumber: settings.arguments is String
-          ? settings.arguments! as String
-          : null,
-    ),
-    '/order-details' => OrderConfirmationPage(
-      confirmation: false,
-      orderNumber: settings.arguments is String
-          ? settings.arguments! as String
-          : null,
-    ),
-    '/orders' => const MyOrdersPage(),
-    '/digital-library' => const DigitalProductLibraryPage(),
-    '/employer' => const EmployerDashboardPage(),
-    '/employees' => const EmployeeManagementPage(),
-    '/assign-course' => const CourseAssignmentPage(),
-    '/reports' => const LearningReportsPage(),
-    '/admin' => const AdminDashboardPage(),
-    '/admin/products' => const ProductManagementPage(),
-    '/admin/orders' => const OrderManagementPage(),
-    '/admin/quotes' => const QuoteManagementPage(),
-    '/admin/enquiries' => const ContactEnquiriesPage(),
     _ => const HomePage(),
   };
   return MaterialPageRoute(
     settings: RouteSettings(name: route),
-    builder: (_) => SiteShell(route: route, child: page),
+    builder: (_) {
+      if (const {'/login', '/register', '/hub', '/upskilling', '/course-detail', '/dashboard', '/course-player', '/quiz', '/certificate', '/trainer-dashboard'}.contains(route)) {
+        return page;
+      }
+
+      return SiteShell(route: route, child: page);
+    },
   );
 }
 
