@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'commerce/commerce_prototype_store.dart';
+import 'shared/auth_prototype_store.dart';
 import 'theme.dart';
 
 const navItems = <String, String>{
@@ -22,9 +24,9 @@ const corporateNavItems = <String, String>{
   'Impact Stories': '/impact',
 };
 
-void go(BuildContext context, String route) {
+void go(BuildContext context, String route, {Object? arguments}) {
   if (ModalRoute.of(context)?.settings.name != route) {
-    Navigator.pushNamed(context, route);
+    Navigator.pushNamed(context, route, arguments: arguments);
   }
 }
 
@@ -35,19 +37,48 @@ class SiteShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final desktop = MediaQuery.sizeOf(context).width >= 1320;
+    final desktop = MediaQuery.sizeOf(context).width >= 1500;
+    final compactHeader = MediaQuery.sizeOf(context).width < 440;
+    final signedIn = AuthPrototypeStore.instance.isSignedIn;
+    final role = AuthPrototypeStore.instance.role;
+    final workspaceRoute = switch (role) {
+      'Admin' => '/admin',
+      'Employer' => '/employer',
+      _ => null,
+    };
+    final workspaceLabel = switch (role) {
+      'Admin' => 'Admin portal',
+      'Employer' => 'Employer portal',
+      _ => null,
+    };
+    void signOut() {
+      AuthPrototypeStore.instance.signOut();
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+    }
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: desktop
             ? null
             : Builder(
-                builder: (context) => IconButton(
-                  tooltip: 'Open navigation',
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
+                builder: (context) => Row(
+                  children: [
+                    if (Navigator.canPop(context))
+                      IconButton(
+                        tooltip: 'Go back',
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.maybePop(context),
+                      ),
+                    IconButton(
+                      tooltip: 'Open navigation',
+                      icon: const Icon(Icons.menu),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    ),
+                  ],
                 ),
               ),
+        leadingWidth: desktop ? null : (Navigator.canPop(context) ? 104 : 56),
         toolbarHeight: 84,
         titleSpacing: desktop ? 36 : 16,
         title: InkWell(
@@ -66,7 +97,7 @@ class SiteShell extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -77,10 +108,11 @@ class SiteShell extends StatelessWidget {
                       letterSpacing: 1.2,
                     ),
                   ),
-                  Text(
-                    'People grow. Organizations thrive.',
-                    style: TextStyle(fontSize: 10, color: purple),
-                  ),
+                  if (!compactHeader)
+                    const Text(
+                      'People grow. Organizations thrive.',
+                      style: TextStyle(fontSize: 10, color: purple),
+                    ),
                 ],
               ),
             ],
@@ -88,6 +120,12 @@ class SiteShell extends StatelessWidget {
         ),
         actions: desktop
             ? [
+                if (Navigator.canPop(context))
+                  IconButton(
+                    tooltip: 'Go back',
+                    onPressed: () => Navigator.maybePop(context),
+                    icon: const Icon(Icons.arrow_back),
+                  ),
                 for (final item in navItems.entries.take(3))
                   TextButton(
                     onPressed: () => go(context, item.value),
@@ -124,11 +162,31 @@ class SiteShell extends StatelessWidget {
                     ),
                   ),
                 ),
-                for (final item in navItems.entries.skip(3))
+                for (final item
+                    in navItems.entries
+                        .skip(3)
+                        .where(
+                          (item) =>
+                              !signedIn ||
+                              !const {'Login', 'Register'}.contains(item.key),
+                        ))
                   TextButton(
                     onPressed: () => go(context, item.value),
                     child: item.key == 'Cart'
-                        ? const Icon(Icons.shopping_bag_outlined, size: 20)
+                        ? AnimatedBuilder(
+                            animation: CommercePrototypeStore.instance,
+                            builder: (context, _) => Badge(
+                              isLabelVisible:
+                                  CommercePrototypeStore.instance.cartCount > 0,
+                              label: Text(
+                                '${CommercePrototypeStore.instance.cartCount}',
+                              ),
+                              child: const Icon(
+                                Icons.shopping_bag_outlined,
+                                size: 20,
+                              ),
+                            ),
+                          )
                         : Text(
                             item.key,
                             style: TextStyle(
@@ -137,6 +195,30 @@ class SiteShell extends StatelessWidget {
                                   : FontWeight.w500,
                             ),
                           ),
+                  ),
+                if (workspaceRoute != null && workspaceLabel != null)
+                  TextButton.icon(
+                    onPressed: () => go(context, workspaceRoute),
+                    icon: Icon(
+                      role == 'Admin'
+                          ? Icons.admin_panel_settings_outlined
+                          : Icons.business_outlined,
+                      size: 18,
+                    ),
+                    label: Text(
+                      workspaceLabel,
+                      style: TextStyle(
+                        fontWeight: route == workspaceRoute
+                            ? FontWeight.w900
+                            : FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                if (signedIn)
+                  TextButton.icon(
+                    onPressed: signOut,
+                    icon: const Icon(Icons.logout, size: 18),
+                    label: const Text('Sign out'),
                   ),
                 const SizedBox(width: 24),
               ]
@@ -160,19 +242,60 @@ class SiteShell extends StatelessWidget {
                         ),
                       ),
                     ),
-                    for (final item in navItems.entries)
-                      ListTile(
-                        title: Text(item.key),
-                        selected: route == item.value,
-                        selectedColor: deepBlue,
-                        selectedTileColor: softYellow.withValues(alpha: .28),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    for (final item in navItems.entries.where(
+                      (item) =>
+                          !signedIn ||
+                          !const {'Login', 'Register'}.contains(item.key),
+                    ))
+                      Material(
+                        type: MaterialType.transparency,
+                        child: ListTile(
+                          title: Text(item.key),
+                          selected: route == item.value,
+                          selectedColor: deepBlue,
+                          selectedTileColor: softYellow.withValues(alpha: .28),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            go(context, item.value);
+                          },
                         ),
-                        onTap: () {
-                          Navigator.pop(context);
-                          go(context, item.value);
-                        },
+                      ),
+                    if (workspaceRoute != null && workspaceLabel != null)
+                      Material(
+                        type: MaterialType.transparency,
+                        child: ListTile(
+                          leading: Icon(
+                            role == 'Admin'
+                                ? Icons.admin_panel_settings_outlined
+                                : Icons.business_outlined,
+                          ),
+                          title: Text(workspaceLabel),
+                          selected: route == workspaceRoute,
+                          selectedColor: deepBlue,
+                          selectedTileColor: softYellow.withValues(alpha: .28),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            go(context, workspaceRoute);
+                          },
+                        ),
+                      ),
+                    if (signedIn)
+                      Material(
+                        type: MaterialType.transparency,
+                        child: ListTile(
+                          leading: const Icon(Icons.logout),
+                          title: const Text('Sign out'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            signOut();
+                          },
+                        ),
                       ),
                     const Padding(
                       padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
@@ -187,18 +310,21 @@ class SiteShell extends StatelessWidget {
                       ),
                     ),
                     for (final item in corporateNavItems.entries)
-                      ListTile(
-                        title: Text(item.key),
-                        selected: route == item.value,
-                        selectedColor: deepBlue,
-                        selectedTileColor: softYellow.withValues(alpha: .28),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                      Material(
+                        type: MaterialType.transparency,
+                        child: ListTile(
+                          title: Text(item.key),
+                          selected: route == item.value,
+                          selectedColor: deepBlue,
+                          selectedTileColor: softYellow.withValues(alpha: .28),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            go(context, item.value);
+                          },
                         ),
-                        onTap: () {
-                          Navigator.pop(context);
-                          go(context, item.value);
-                        },
                       ),
                   ],
                 ),

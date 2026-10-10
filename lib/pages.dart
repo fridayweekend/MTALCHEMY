@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'theme.dart';
 import 'widgets.dart';
+import 'admin/admin_pages.dart';
+import 'commerce/order_pages.dart';
+import 'commerce/store_pages.dart';
+import 'commerce/quote_pages.dart';
+import 'commerce/commerce_prototype_store.dart';
+import 'employer/employer_pages.dart';
+import 'shared/auth_prototype_store.dart';
+import 'shared/member3_login_page.dart';
 import 'screens/lms/login_register_screen.dart';
 import 'screens/lms/learning_hub_screen.dart';
 import 'screens/lms/course_detail_screen.dart';
@@ -13,6 +21,23 @@ import 'screens/lms/quiz_screen.dart';
 
 Route<dynamic> buildRoute(RouteSettings settings) {
   final route = settings.name ?? '/';
+  final requiredRoles = _requiredRolesFor(route);
+  if (requiredRoles != null &&
+      !requiredRoles.any(AuthPrototypeStore.instance.hasRole)) {
+    final requiredRole = requiredRoles.join(' or ');
+    final signedIn = AuthPrototypeStore.instance.isSignedIn;
+    final page = signedIn
+        ? Member3AccessDeniedPage(requiredRole: requiredRole)
+        : Member3LoginPage(
+            redirectRoute: route,
+            requiredRole: requiredRole,
+            allowedRoles: requiredRoles,
+          );
+    return MaterialPageRoute(
+      settings: const RouteSettings(name: '/login'),
+      builder: (_) => SiteShell(route: '/login', child: page),
+    );
+  }
   final page = switch (route) {
     '/' => const HomePage(),
     '/about' => const AboutPage(),
@@ -26,34 +51,81 @@ Route<dynamic> buildRoute(RouteSettings settings) {
     '/upskilling' => const LearningHubScreen(),
     '/hub' => const LearningHubScreen(),
     '/course-detail' => CourseDetailScreen(
-      courseId: settings.arguments as String,
+      courseId: settings.arguments is String
+          ? settings.arguments! as String
+          : 'ei-fundamentals',
+    ),
+    '/store' => const StorePage(),
+    '/login' => Member3LoginPage(
+      redirectRoute: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/register' => const LoginRegisterScreen(),
+    '/cart' => const CartPage(),
+    '/product' => ProductDetailPage(
+      productId: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
     ),
     '/dashboard' => LearnerDashboardScreen(
-      courseId: settings.arguments as String? ?? 'ei-fundamentals',
+      courseId: settings.arguments is String
+          ? settings.arguments! as String
+          : 'ei-fundamentals',
     ),
-     '/course-player' => CoursePlayerScreen(
-      courseId: settings.arguments as String? ?? 'ei-fundamentals',
+    '/course-player' => CoursePlayerScreen(
+      courseId: settings.arguments is String
+          ? settings.arguments! as String
+          : 'ei-fundamentals',
     ),
-     '/quiz' => QuizScreen(
-      courseId: settings.arguments as String? ?? 'ei-fundamentals',
+    '/quiz' => QuizScreen(
+      courseId: settings.arguments is String
+          ? settings.arguments! as String
+          : 'ei-fundamentals',
     ),
     '/certificate' => CertificateScreen(
-      courseId: (settings.arguments as Map?)?['courseId'] as String? ?? 'ei-fundamentals',
-      score: (settings.arguments as Map?)?['score'] as String? ?? '',
+      courseId: settings.arguments is Map
+          ? (settings.arguments as Map)['courseId'] as String? ?? 'ei-fundamentals'
+          : 'ei-fundamentals',
+      score: settings.arguments is Map
+          ? (settings.arguments as Map)['score'] as String? ?? ''
+          : '',
     ),
     '/trainer-dashboard' => const TrainerDashboardScreen(),
-    '/store' => const ModuleHandoffPage(
-      title: 'Store',
-      owner: 'Member 3 - E-Commerce',
-      icon: Icons.storefront_outlined,
+    '/checkout' => const CheckoutPage(),
+    '/quote-request' => QuoteRequestPage(
+      productId: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
     ),
-    '/login' => const LoginRegisterScreen(),
-    '/register' => const LoginRegisterScreen(),
-    '/cart' => const ModuleHandoffPage(
-      title: 'Cart',
-      owner: 'Member 3 - E-Commerce',
-      icon: Icons.shopping_bag_outlined,
+    '/quote-confirmation' => QuoteConfirmationPage(
+      reference: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
     ),
+    '/quote-requests' => const MyQuoteRequestsPage(),
+    '/order-confirmation' => OrderConfirmationPage(
+      orderNumber: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/order-details' => OrderConfirmationPage(
+      confirmation: false,
+      orderNumber: settings.arguments is String
+          ? settings.arguments! as String
+          : null,
+    ),
+    '/orders' => const MyOrdersPage(),
+    '/digital-library' => const DigitalProductLibraryPage(),
+    '/employer' => const EmployerDashboardPage(),
+    '/employees' => const EmployeeManagementPage(),
+    '/assign-course' => const CourseAssignmentPage(),
+    '/reports' => const LearningReportsPage(),
+    '/admin' => const AdminDashboardPage(),
+    '/admin/products' => const ProductManagementPage(),
+    '/admin/orders' => const OrderManagementPage(),
+    '/admin/quotes' => const QuoteManagementPage(),
+    '/admin/enquiries' => const ContactEnquiriesPage(),
     _ => const HomePage(),
   };
   return MaterialPageRoute(
@@ -66,6 +138,27 @@ Route<dynamic> buildRoute(RouteSettings settings) {
       return SiteShell(route: route, child: page);
     },
   );
+}
+
+List<String>? _requiredRolesFor(String route) {
+  if (route == '/admin' || route.startsWith('/admin/')) return ['Admin'];
+  if (route == '/employer' ||
+      route == '/employees' ||
+      route == '/assign-course' ||
+      route == '/reports' ||
+      route == '/quote-requests') {
+    return ['Employer'];
+  }
+  if (const {
+    '/checkout',
+    '/orders',
+    '/order-details',
+    '/order-confirmation',
+  }.contains(route)) {
+    return ['Learner', 'Employer'];
+  }
+  if (route == '/digital-library') return ['Learner'];
+  return null;
 }
 
 const services = [
@@ -1955,7 +2048,22 @@ class ContactPage extends StatefulWidget {
 
 class _ContactPageState extends State<ContactPage> {
   final formKey = GlobalKey<FormState>();
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _phone = TextEditingController();
+  final _organization = TextEditingController();
+  final _message = TextEditingController();
   String? enquiryType;
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _phone.dispose();
+    _organization.dispose();
+    _message.dispose();
+    super.dispose();
+  }
+
   String? requiredField(String? value) => value == null || value.trim().isEmpty
       ? 'Please complete this field'
       : null;
@@ -1976,7 +2084,7 @@ class _ContactPageState extends State<ContactPage> {
           "Let's build a thriving workplace together.",
           eyebrow: 'Contact',
           subtitle:
-              'Tell us what you want to strengthen. This checkpoint form validates input but does not send data to a backend.',
+              'Tell us what you want to strengthen. Enquiries are saved to the local prototype inbox for the team to review.',
         ),
         LayoutBuilder(
           builder: (context, box) {
@@ -2024,23 +2132,27 @@ class _ContactPageState extends State<ContactPage> {
                     ),
                     const SizedBox(height: 22),
                     TextFormField(
+                      controller: _name,
                       decoration: const InputDecoration(labelText: 'Name'),
                       validator: requiredField,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _email,
                       decoration: const InputDecoration(labelText: 'Email'),
                       keyboardType: TextInputType.emailAddress,
                       validator: emailField,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _phone,
                       decoration: const InputDecoration(labelText: 'Phone'),
                       keyboardType: TextInputType.phone,
                       validator: requiredField,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _organization,
                       decoration: const InputDecoration(
                         labelText: 'Organization (optional)',
                       ),
@@ -2071,6 +2183,7 @@ class _ContactPageState extends State<ContactPage> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _message,
                       decoration: const InputDecoration(labelText: 'Message'),
                       minLines: 4,
                       maxLines: 6,
@@ -2080,14 +2193,28 @@ class _ContactPageState extends State<ContactPage> {
                     FilledButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
+                          final enquiry = CommercePrototypeStore.instance
+                              .createContactEnquiry(
+                                name: _name.text.trim(),
+                                email: _email.text.trim(),
+                                phone: _phone.text.trim(),
+                                organization: _organization.text.trim(),
+                                enquiryType: enquiryType!,
+                                message: _message.text.trim(),
+                              );
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
-                                'Form validated. Prototype only — no data was sent.',
+                                'Enquiry ${enquiry.reference} saved to the local Admin inbox. No email was sent.',
                               ),
                             ),
                           );
                           formKey.currentState!.reset();
+                          _name.clear();
+                          _email.clear();
+                          _phone.clear();
+                          _organization.clear();
+                          _message.clear();
                           setState(() => enquiryType = null);
                         }
                       },
