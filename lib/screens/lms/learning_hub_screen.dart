@@ -134,6 +134,7 @@ class _LearningHubScreenState extends State<LearningHubScreen> {
                           child: CourseCard(
                             course: course,
                             onViewCourse: () => openCourse(course),
+                            onContinueCourse: () => Navigator.pushNamed(context, '/course-player', arguments: course.id),
                           ),
                         );
                       }).toList(),
@@ -160,3 +161,4 @@ class _LearningHubScreenState extends State<LearningHubScreen> {
     );
   }
 }
+

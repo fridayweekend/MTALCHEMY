@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
+import 'data/progress_store.dart';
 import 'pages.dart';
 import 'theme.dart';
 
-void main() => runApp(const MtAlchemyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await loadProgress();
+  runApp(const MtAlchemyApp());
+}
 
 class MtAlchemyApp extends StatelessWidget {
   const MtAlchemyApp({super.key});
