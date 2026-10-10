@@ -31,7 +31,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Web Project
-        run: flutter build web --release --base-href "/YOUR_REPO_NAME/"
+        run: flutter build web --release --base-href "/MTALCHEMY/"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
